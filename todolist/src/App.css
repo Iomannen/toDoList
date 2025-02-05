@@ -5,28 +5,3 @@
     hsla(0, 0%, 11%, 1) 200px
   );
 }
-.logo {
-  width: 22px;
-  position: relative;
-  top: 4px;
-}
-.label {
-  font-family: "Inter";
-  font-style: italic;
-  display: flex;
-  align-items: center;
-  font-size: 40px;
-  font-weight: 900;
-}
-.mainlogo {
-  height: 200px;
-  display: flex;
-  justify-self: center;
-  gap: 10px;
-}
-.blue {
-  color: hsla(202, 68%, 59%, 1);
-}
-.violet {
-  color: hsla(238, 53%, 59%, 1);
-}
