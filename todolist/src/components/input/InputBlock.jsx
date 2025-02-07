@@ -4,11 +4,11 @@ import Button from "./input_components/button/Button.jsx";
 import "./inputBlock.css";
 class InputBlock extends React.Component {
   render() {
-    const { callback, counter } = this.props;
+    const { callback, enterCallback } = this.props;
     return (
       <div className="taskAdditionBlock">
-        <Input />
-        <Button counter={counter} callback={callback} />
+        <Input enterCallback={enterCallback} />
+        <Button callback={callback} />
       </div>
     );
   }

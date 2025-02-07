@@ -21,11 +21,24 @@ class NewFile extends React.Component {
       };
       tasks.push(obj);
     }
-
     return tasks.map((task) => (
       <div className="task" id={task.name} key={task.name}>
         <label className="checkbox_label">
-          <input type="checkbox" className="task_checkbox"></input>
+          <input
+            id={`checkbox${task.name}`}
+            type="checkbox"
+            className="task_checkbox"
+            onChange={() => {
+              const checkbox = document.getElementById(`checkbox${task.name}`);
+              checkbox.setAttribute("disabled", "disabled");
+              const taskinput = document.getElementById(
+                `task_name${task.name}`
+              );
+              taskinput.classList.add("completedtask_name");
+              localStorage.removeItem(task.name);
+              localStorage.setItem(task.name, false);
+            }}
+          ></input>
           <span className="custom_checkbox"></span>
         </label>
         <input
@@ -46,18 +59,30 @@ class NewFile extends React.Component {
       </div>
     ));
   };
-
+  handleEnter = (event) => {
+    const input = document.querySelector(".input");
+    if (input.value !== "" && event.key === "Enter") {
+      localStorage.setItem(input.value, true);
+      this.setState({ count: localStorage.length });
+      input.value = "";
+    }
+  };
   handleClick = () => {
     const input = document.querySelector(".input");
-    localStorage.setItem(input.value, true);
-    this.setState({ count: localStorage.length });
-    input.value = "";
+    if (input.value !== "") {
+      localStorage.setItem(input.value, true);
+      this.setState({ count: localStorage.length });
+      input.value = "";
+    }
   };
   render() {
     return (
       <div>
         <MainLogotype />
-        <InputBlock callback={this.handleClick} />
+        <InputBlock
+          callback={this.handleClick}
+          enterCallback={this.handleEnter}
+        />
         <BottomButtons />
         <TasksCounter counter={this.state.count} />
         <TaskList callback={this.renderList} />
