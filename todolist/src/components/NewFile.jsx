@@ -5,6 +5,7 @@ import InputBlock from "../components/input/InputBlock.jsx";
 import BottomButtons from "../components/bottom_buttons/BottomButtons_block.jsx";
 import TasksCounter from "../components/tasks_counter/TasksCounter.jsx";
 import TaskList from "../components/tasklist/TaskList.jsx";
+import DeleteButton from "./tasklist/task/DeleteButton.jsx";
 
 class NewFile extends React.Component {
   state = {
@@ -29,8 +30,8 @@ class NewFile extends React.Component {
             type="checkbox"
             className="task_checkbox"
             onChange={() => {
-              const checkbox = document.getElementById(`checkbox${task.name}`);
-              checkbox.setAttribute("disabled", "disabled");
+              const checkbox = document.getElementById(`checkbox${task.name}`); // этот инпут нужно сделать отдельным компонентом, тогда можно будет прокинуть в него колбэк и сет стейт колбэк
+              checkbox.setAttribute("disabled", "disabled"); // если что то не понятно
               const taskinput = document.getElementById(
                 `task_name${task.name}`
               );
@@ -48,16 +49,12 @@ class NewFile extends React.Component {
           id={`task_name${task.name}`}
         ></input>
         <button className="edit_button"></button>
-        <button
-          className="delete_button"
-          onClick={() => {
-            localStorage.removeItem(task.name);
-            const div = document.getElementById(task.name);
-            div.remove();
-          }}
-        ></button>
+        <DeleteButton taskprop={task} deleteCallback={this.deleteButton} />
       </div>
     ));
+  };
+  deleteButton = () => {
+    this.setState({ count: localStorage.length }); // величайшее изобретение человечества
   };
   handleEnter = (event) => {
     const input = document.querySelector(".input");
