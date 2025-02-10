@@ -28,7 +28,7 @@ class BottomButtons extends React.Component {
           <BottomButton
             content={"Очистить"}
             callback={deletebutton}
-            classname={"bottombutton deletebutton"}
+            classname={"bottombutton deletebutton disappear"}
           />
         </div>
       </div>

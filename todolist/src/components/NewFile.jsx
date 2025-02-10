@@ -20,17 +20,21 @@ class NewFile extends React.Component {
     this.setState({ render: this.state.renderTasks.length });
     const keys = Object.keys(localStorage);
     for (let key of keys) {
+      const task = JSON.parse(key);
       if (localStorage.getItem(key) === "true") {
-        this.tasks.push(JSON.parse(key));
-        this.inprocesstasks.push(JSON.parse(key));
+        this.tasks.push(task);
+        this.inprocesstasks.push(task);
       }
     }
     for (let key of keys) {
+      const task = JSON.parse(key);
       if (localStorage.getItem(key) === "false") {
-        this.tasks.push(JSON.parse(key));
-        this.completetasks.push(JSON.parse(key));
+        task.complete = true;
+        this.tasks.push(task);
+        this.completetasks.push(task);
       }
     }
+
     this.setState({
       counter: this.tasks.length,
       completeCounter: this.completetasks.length,
@@ -44,6 +48,7 @@ class NewFile extends React.Component {
             id={`checkbox${task.name}`}
             type="checkbox"
             className="task_checkbox"
+            aria-checked="false"
             onChange={() => {
               const checkbox = document.getElementById(`checkbox${task.name}`); // этот инпут нужно сделать отдельным компонентом, тогда можно будет прокинуть в него колбэк и сет стейт колбэк
               checkbox.setAttribute("disabled", "disabled"); // если что то не понятно
@@ -72,11 +77,42 @@ class NewFile extends React.Component {
           disabled
           id={`task_name${task.name}`}
         ></input>
-        <button className="edit_button"></button>
-        <DeleteButton taskprop={task} deleteCallback={this.deleteButton} />
+        <button
+          className="edit_button"
+          onClick={() => {
+            const input = document.getElementById(`task_name${task.name}`);
+            input.removeAttribute("disabled", "disabled");
+          }}
+        ></button>
+        <DeleteButton taskprop={task} deleteCallback={this.deleteTask} />
       </div>
     ));
   };
+  deleteTask = (taskprop) => {
+    const task = document.getElementById(taskprop.name);
+    const arrayWithoutTask = this.tasks.filter((item) => item.name !== task.id);
+    const completeArrayWithoutTask = this.completetasks.filter(
+      (item) => item.name !== task.id
+    );
+    const inprocessArrayWithoutTask = this.inprocesstasks.filter(
+      (item) => item.name !== task.id
+    );
+    this.completetasks = completeArrayWithoutTask;
+    this.inprocesstasks = inprocessArrayWithoutTask;
+    this.tasks = arrayWithoutTask;
+    Object.keys(localStorage).forEach((key) => {
+      const localStorageTask = JSON.parse(key);
+      if (localStorageTask.name === task.id) {
+        localStorage.removeItem(key);
+      }
+    });
+    this.setState({
+      counter: this.tasks.length,
+      completeCounter: this.completetasks.length,
+      renderTasks: this.tasks,
+    });
+  };
+  handleEditButton = () => {};
   deleteButton = () => {
     this.tasks = this.tasks.filter((task) => !task.complete);
     this.inprocesstasks = [...this.tasks]; // Синхронизируем массив невыполненных задач
@@ -132,6 +168,8 @@ class NewFile extends React.Component {
     const secondbutton = document.querySelector(".inprocessbutton");
     firstbutton.classList.remove("active");
     secondbutton.classList.remove("active");
+    const clearTasksButton = document.querySelector(".deletebutton");
+    clearTasksButton.classList.add("disappear");
     console.log(button);
     this.setState({ renderTasks: this.tasks });
     this.setState({ counter: this.tasks.length });
@@ -143,6 +181,8 @@ class NewFile extends React.Component {
     const secondbutton = document.querySelector(".inprocessbutton");
     firstbutton.classList.remove("active");
     secondbutton.classList.remove("active");
+    const clearTasksButton = document.querySelector(".deletebutton");
+    clearTasksButton.classList.remove("disappear");
     this.setState({ renderTasks: this.completetasks });
     this.setState({ counter: this.completetasks.length });
   };
@@ -153,13 +193,13 @@ class NewFile extends React.Component {
     const secondbutton = document.querySelector(".completebutton");
     firstbutton.classList.remove("active");
     secondbutton.classList.remove("active");
+    const clearTasksButton = document.querySelector(".deletebutton");
+    clearTasksButton.classList.add("disappear");
     this.setState({ renderTasks: this.inprocesstasks });
     this.setState({ counter: this.inprocesstasks.length });
     this.setState({ completeCounter: 0 });
   };
   render() {
-    console.log(localStorage);
-    console.log(this.completetasks, this.inprocesstasks, this.tasks);
     return (
       <div>
         <MainLogotype />
@@ -177,7 +217,11 @@ class NewFile extends React.Component {
           counter={this.state.counter}
           secondCounter={this.state.completeCounter}
         />
-        <TaskList callback={this.renderList} tasks={this.state.renderTasks} />
+        <TaskList
+          callback={this.renderList}
+          tasks={this.state.renderTasks}
+          deletetask={this.deleteTask}
+        />
       </div>
     );
   }

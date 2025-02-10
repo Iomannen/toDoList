@@ -28,3 +28,6 @@
   background-color: hsla(202, 68%, 37%, 1);
   mix-blend-mode: normal;
 }
+.disappear {
+  visibility: hidden;
+}
