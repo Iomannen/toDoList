@@ -20,3 +20,11 @@
   scale: 1.02;
   cursor: pointer;
 }
+.active {
+  background-color: hsla(202, 68%, 37%, 1);
+  mix-blend-mode: normal;
+}
+.deletebutton:hover {
+  background-color: hsla(202, 68%, 37%, 1);
+  mix-blend-mode: normal;
+}

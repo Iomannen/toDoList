@@ -3,10 +3,10 @@ import Task from "./task/Task";
 import "./taskList.css";
 class TaskList extends React.Component {
   render() {
-    const { callback } = this.props;
+    const { callback, tasks } = this.props;
     return (
       <div className="tasklist">
-        <Task callback={callback} />
+        <Task callback={callback} tasks={tasks} />
       </div>
     );
   }

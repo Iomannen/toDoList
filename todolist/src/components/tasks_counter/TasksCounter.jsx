@@ -4,7 +4,7 @@ import "./tasks_counter.css";
 
 class TasksCounter extends React.Component {
   render() {
-    const { counter } = this.props;
+    const { counter, secondCounter } = this.props;
     return (
       <div className="tasksCounter">
         <TasksCounterModule
@@ -13,7 +13,7 @@ class TasksCounter extends React.Component {
         />
         <TasksCounterModule
           content={"Завершено"}
-          counter={`0 из ${counter}`} //  этой функцией я перебираю задачи в локалсторедже, те которые false те не выполнены
+          counter={`${secondCounter} из ${counter}`} //  этой функцией я перебираю задачи в локалсторедже, те которые false те не выполнены
         />
       </div>
     );
