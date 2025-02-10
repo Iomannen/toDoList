@@ -12,6 +12,7 @@ class NewFile extends React.Component {
   inprocesstasks = [];
   tasks = [];
   state = {
+    stateChange: 0,
     renderTasks: this.tasks,
     counter: 0,
     completeCounter: this.completetasks.length,
@@ -48,7 +49,7 @@ class NewFile extends React.Component {
             id={`checkbox${task.name}`}
             type="checkbox"
             className="task_checkbox"
-            aria-checked="false"
+            checked={task.complete}
             onChange={() => {
               const checkbox = document.getElementById(`checkbox${task.name}`); // этот инпут нужно сделать отдельным компонентом, тогда можно будет прокинуть в него колбэк и сет стейт колбэк
               checkbox.setAttribute("disabled", "disabled"); // если что то не понятно
@@ -65,7 +66,6 @@ class NewFile extends React.Component {
               this.completetasks.unshift(task);
               tasks.splice(this.inprocesstasks.length, 0, task);
               console.log(task);
-
               this.setState({ completeCounter: this.completetasks.length });
             }}
           ></input>
@@ -76,12 +76,50 @@ class NewFile extends React.Component {
           placeholder={task.name}
           disabled
           id={`task_name${task.name}`}
+          onKeyUp={(event) => {
+            const input = document.getElementById(`task_name${task.name}`);
+            if (event.key === "Enter" && input.value !== input.placeholder) {
+              input.setAttribute("disabled", "disabled");
+              input.placeholder = input.value;
+            }
+          }}
+          onBlur={() => {
+            const input = document.getElementById(`task_name${task.name}`);
+            if (input.value !== input.placeholder) {
+              input.setAttribute("disabled", "disabled");
+            }
+            this.tasks.forEach((elem) => {
+              if (elem.name === task.name) {
+                elem.name = input.value;
+              }
+            });
+            Object.keys(localStorage).forEach((key) => {
+              const localStorageTask = JSON.parse(key);
+              if (
+                localStorageTask.name === input.placeholder &&
+                input.value !== ""
+              ) {
+                if (input.value !== input.placeholder) {
+                  input.setAttribute("disabled", "disabled");
+                  input.placeholder = input.value;
+                  localStorageTask.name = input.value;
+                  const newKey = localStorage.getItem(key);
+                  localStorage.removeItem(key);
+                  localStorage.setItem(
+                    JSON.stringify(localStorageTask),
+                    newKey
+                  );
+                }
+              } // проблема в том что три раза эта задача снизу обрабатывается короче пятикратно переваренный кал
+            });
+          }}
         ></input>
         <button
           className="edit_button"
           onClick={() => {
             const input = document.getElementById(`task_name${task.name}`);
             input.removeAttribute("disabled", "disabled");
+            input.focus();
           }}
         ></button>
         <DeleteButton taskprop={task} deleteCallback={this.deleteTask} />
@@ -200,6 +238,9 @@ class NewFile extends React.Component {
     this.setState({ completeCounter: 0 });
   };
   render() {
+    console.log(this.completetasks);
+    console.log(this.inprocesstasks);
+    console.log(this.tasks);
     return (
       <div>
         <MainLogotype />
