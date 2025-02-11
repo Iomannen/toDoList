@@ -6,12 +6,14 @@ import BottomButtons from "../components/bottom_buttons/BottomButtons_block.jsx"
 import TasksCounter from "../components/tasks_counter/TasksCounter.jsx";
 import TaskList from "../components/tasklist/TaskList.jsx";
 import DeleteButton from "./tasklist/task/DeleteButton.jsx";
-
+import { formatDistance, subSeconds } from "date-fns";
+import { ru } from "date-fns/locale";
 class NewFile extends React.Component {
   completetasks = [];
   inprocesstasks = [];
   tasks = [];
   state = {
+    hover: 0,
     stateChange: 0,
     renderTasks: this.tasks,
     counter: 0,
@@ -20,6 +22,7 @@ class NewFile extends React.Component {
   componentDidMount = () => {
     this.setState({ render: this.state.renderTasks.length });
     const keys = Object.keys(localStorage);
+    keys.forEach((task) => {});
     for (let key of keys) {
       const task = JSON.parse(key);
       if (localStorage.getItem(key) === "true") {
@@ -36,16 +39,41 @@ class NewFile extends React.Component {
       }
     }
 
+    console.log(this.tasks);
     this.setState({
       counter: this.tasks.length,
       completeCounter: this.completetasks.length,
     });
   };
   renderList = (tasks) => {
+    tasks.sort((a, b) => {
+      if (a.complete !== b.complete) {
+        return String(a.complete).localeCompare(String(b.complete)); // "pending" раньше "completed"
+      }
+      // Если статусы одинаковые, сортируем по второму полю (priority)
+      return b.timestamp - a.timestamp;
+    });
     return tasks.map((task, index) => (
-      <div className="task" id={task.name} key={task.name}>
+      <div
+        className="task"
+        id={task.name}
+        key={task.name}
+        onMouseEnter={() => {
+          this.setState({ hover: Date.now() });
+        }}
+        title={`${task.complete ? "Завершена" : "Создана"} ${formatDistance(
+          subSeconds(task.timestamp, 0),
+          this.state.hover,
+          {
+            addSuffix: true,
+            locale: ru,
+            includeSeconds: true,
+          }
+        )}`}
+      >
         <label className="checkbox_label">
           <input
+            disabled={task.complete ? true : false}
             id={`checkbox${task.name}`}
             type="checkbox"
             className="task_checkbox"
@@ -85,11 +113,12 @@ class NewFile extends React.Component {
           }}
           onBlur={() => {
             const input = document.getElementById(`task_name${task.name}`);
-            if (input.value !== input.placeholder) {
+            console.log(input.value);
+            if (input.value === "") {
               input.setAttribute("disabled", "disabled");
             }
             this.tasks.forEach((elem) => {
-              if (elem.name === task.name) {
+              if (elem.name === task.name && input.value === null) {
                 elem.name = input.value;
               }
             });
@@ -112,10 +141,11 @@ class NewFile extends React.Component {
                 }
               } // проблема в том что три раза эта задача снизу обрабатывается короче пятикратно переваренный кал
             });
+            this.setState({ stateChange: this.state.stateChange + 1 });
           }}
         ></input>
         <button
-          className="edit_button"
+          className={`edit_button ${task.complete ? "disappear" : ""}`}
           onClick={() => {
             const input = document.getElementById(`task_name${task.name}`);
             input.removeAttribute("disabled", "disabled");
@@ -150,7 +180,6 @@ class NewFile extends React.Component {
       renderTasks: this.tasks,
     });
   };
-  handleEditButton = () => {};
   deleteButton = () => {
     this.tasks = this.tasks.filter((task) => !task.complete);
     this.inprocesstasks = [...this.tasks]; // Синхронизируем массив невыполненных задач
@@ -233,6 +262,7 @@ class NewFile extends React.Component {
     secondbutton.classList.remove("active");
     const clearTasksButton = document.querySelector(".deletebutton");
     clearTasksButton.classList.add("disappear");
+    this.inprocesstasks.sort((a, b) => b.timestamp - a.timestamp);
     this.setState({ renderTasks: this.inprocesstasks });
     this.setState({ counter: this.inprocesstasks.length });
     this.setState({ completeCounter: 0 });

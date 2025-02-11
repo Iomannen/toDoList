@@ -30,3 +30,6 @@
 ::-webkit-scrollbar-thumb:hover {
   background: hsla(202, 68%, 37%, 1);
 }
+.disappear {
+  visibility: hidden;
+}
