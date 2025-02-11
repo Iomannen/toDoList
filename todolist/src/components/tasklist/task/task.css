@@ -90,6 +90,12 @@ button {
   height: 14px;
   background-image: url("./delete.svg");
 }
+.edit_button:hover {
+  background-image: url("./editon.svg");
+}
+.delete_button:hover {
+  background-image: url("./deleteon.svg");
+}
 button:hover {
   scale: 1.2;
 }
